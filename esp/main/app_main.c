@@ -25,12 +25,14 @@
 #include "mqtt_client.h"
 
 // Include for testing the stacks of the tasks
-#define INCLUDE_uxTaskGetStackHighWaterMark
+#ifndef INCLUDE_uxTaskGetStackHighWaterMark
+    #define INCLUDE_uxTaskGetStackHighWaterMark
+#endif
 #define TASK_STACK_SIZE 2500
 
 #define STRING_BUFFER_SIZE 50
 
-#define MQTT_BROKER_URI "mqtt://192.168.225.216:1885"
+#define MQTT_BROKER_URI "mqtt://192.168.225.197:1885"
 
 // Wifi Credentials
 // Home
@@ -198,7 +200,7 @@ static void blink_led(void)
     // Set the GPIO level according to the state (LOW or HIGH)
     gpio_set_level(BLINK_GPIO, s_led_state);
 }
-
+ 
 void vTaskTest(void *pvParameters)
 {
     /* The parameter value is expected to be 1 as 1 is passed in the
