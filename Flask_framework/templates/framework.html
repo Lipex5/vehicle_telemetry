@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<head>
+  
+  {% block head %}
+  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+
+  <title>{% block title %}{% endblock %} - Telemetria Automovel</title>
+  {% endblock %}
+
+</head>
+
+
+
+<body>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Isep-logo.png/800px-Isep-logo.png" alt="ISEP Logo" style="float:right;width: 12%;height: 12%;">
+  <h1><i>Telemetria Automovel</i></h1>
+  <div id="content">{% block content %}{% endblock %}</div>
+  <h2>Dados</h2>
+  <table>
+    <tr>
+      <th>Grandeza</th>
+      <th>Valor</th>
+      <th>Incerteza</th>
+    </tr>
+    <tr>
+      <td>Velocidade Instantânea</td>
+      <td><mark>TESTE</mark></td>
+      <td>±</td>
+    </tr>
+    <tr>
+      <td>Velocidade Média</td>
+      <td><mark>TESTE</mark></td>
+      <td>±</td>
+    </tr>
+    <tr>
+      <td>Aceleração Instantânea</td>
+      <td><mark>TESTE</mark></td>
+      <td>±</td>
+    </tr>
+    <tr>
+      <td>Aceleração Média</td>
+      <td><mark>TESTE</mark></td>
+      <td>±</td>
+    </tr>
+  </table>
+
+  <h2>Coordenadas</h2>
+  <p>Click the button to get your coordinates.</p>
+
+  <button onclick="getLocation()">Try It</button>
+
+  <p id="demo"></p>
+
+  <script>
+    var x = document.getElementById("demo");
+
+    function getLocation() {
+      if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else { 
+      x.innerHTML = "Geolocation is not supported by this browser.";
+      }
+    }
+
+    function showPosition(position) {
+      x.innerHTML = "Latitude: " + position.coords.latitude + 
+    "<br>Longitude: " + position.coords.longitude;
+    }
+  </script>
+  
+  <p>Led state: </p>
+  
+  <div id="footer">
+    <p></p>
+    {% block footer %}
+    &copy; Copyright 2022 by <a href="http://localhost:5001/Hugo">Hugo</a>.
+    {% endblock %}
+  </div>
+
+  
+  
+</body>
+
+
+</html>
