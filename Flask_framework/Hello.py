@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 # region MQTT
 # Configure Flask-MQTT extension
-app.config["MQTT_BROKER_URL"] = "192.168.225.197"
+app.config["MQTT_BROKER_URL"] = "192.168.0.20"
 app.config["MQTT_BROKER_PORT"] = 1885
 app.config[
     "MQTT_USERNAME"

@@ -88,13 +88,21 @@
     function update() {
       let doc = document.getElementById("time");
 
-      fetch("/api/time").then(
+      fetch("/mqtt/data/").then(
         response => response.json()
-      ).then(
-        function (data) {
-          console.log(data["now"]);
-          doc.innerText = data["now"];
+        ).then(
+          function (data) {
+          console.log(data["led"]);
+          doc.innerText = data["led"];
         });
+
+      // fetch("/api/time").then(
+      //   response => response.json()
+      // ).then(
+      //   function (data) {
+      //     console.log(data["now"]);
+      //     doc.innerText = data["now"];
+      //   });
     }
 
     // update all 10000 ms
