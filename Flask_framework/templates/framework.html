@@ -74,19 +74,11 @@
     }
   </script>
 
-  <p>Led state: </p>
-
-  <body>
-    <h1>Hello, World!</h1>
-    <h2>The date and time on the server is</h2>
-    <h2 id="time">{{ time }}</p></h2>
-
-  </body>
-
+  <p>Led state: </p><var id="led_status">{{ led_status }}</p></var>
 
   <script type="text/javascript">
     function update() {
-      let doc = document.getElementById("time");
+      let doc = document.getElementById("led_status");
 
       fetch("/mqtt/data/").then(
         response => response.json()
@@ -95,17 +87,9 @@
           console.log(data["led"]);
           doc.innerText = data["led"];
         });
-
-      // fetch("/api/time").then(
-      //   response => response.json()
-      // ).then(
-      //   function (data) {
-      //     console.log(data["now"]);
-      //     doc.innerText = data["now"];
-      //   });
     }
 
-    // update all 10000 ms
+    // Update
     (function () {
       update();
       setInterval(function () {
@@ -121,8 +105,6 @@
     &copy; Copyright 2022 by <a href="http://localhost:5001/Hugo">Hugo</a>.
     {% endblock %}
   </div>
-
-
 
 </body>
 

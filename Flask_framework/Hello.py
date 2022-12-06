@@ -49,6 +49,7 @@ def handle_mqtt_message(client, userdata, message):
 
     print("Received message on topic: {topic} with payload: {payload}".format(**data))
     
+    # Call to the parse function
     parse_data(data)
 
 
@@ -58,7 +59,6 @@ def publish_message():
     request_data = request.get_json()
     publish_result = mqtt_client.publish(request_data["topic"], request_data["msg"])
     return jsonify({"code": publish_result[0]})
-
 
 # endregion
 
@@ -83,24 +83,19 @@ def Tab(name):
     return f"Hello, {escape(name)}!"
 
 
-@app.route("/api/time")
-def now():
-    return {"now": datetime.datetime.now().isoformat()}
-
-
 @app.route("/mqtt/data/")
 def get_data():
-    return esp_data["led"]
+    return {"led": esp_data["led"]}
 
 
 
 
 
-
-
+#region Data parsing function
 def parse_data(data):
     if data["topic"] == topic_led:
         if esp_data["led"] == 0:
             esp_data["led"] = 1
         else:
             esp_data["led"] = 0
+#endregion
