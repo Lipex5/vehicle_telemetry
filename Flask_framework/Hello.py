@@ -1,6 +1,7 @@
 import random
 import time
 import math
+import datetime
 
 from flask import render_template
 from flask import request
@@ -67,3 +68,7 @@ def Tab(name):
     variable = math.pi
     print(f"|The value of PI is: {variable: }")
     return f"Hello, {escape(name)}!"
+
+@app.route("/api/time")
+def now():
+    return {"now": datetime.datetime.now().isoformat()}

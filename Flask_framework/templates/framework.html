@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <head>
-  
+
   {% block head %}
-  <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
 
   <title>{% block title %}{% endblock %} - Telemetria Automovel</title>
   {% endblock %}
@@ -17,7 +17,8 @@
 
 
 <body>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Isep-logo.png/800px-Isep-logo.png" alt="ISEP Logo" style="float:right;width: 12%;height: 12%;">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Isep-logo.png/800px-Isep-logo.png" alt="ISEP Logo"
+    style="float:right;width: 12%;height: 12%;">
   <h1><i>Telemetria Automovel</i></h1>
   <div id="content">{% block content %}{% endblock %}</div>
   <h2>Dados</h2>
@@ -61,20 +62,51 @@
 
     function getLocation() {
       if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition);
-    } else { 
-      x.innerHTML = "Geolocation is not supported by this browser.";
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
       }
     }
 
     function showPosition(position) {
-      x.innerHTML = "Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude;
+      x.innerHTML = "Latitude: " + position.coords.latitude +
+        "<br>Longitude: " + position.coords.longitude;
     }
   </script>
-  
+
   <p>Led state: </p>
-  
+
+  <body>
+    <h1>Hello, World!</h1>
+    <h2>The date and time on the server is</h2>
+    <h2 id="time">{{ time }}</p></h2>
+
+  </body>
+
+
+  <script type="text/javascript">
+    function update() {
+      let doc = document.getElementById("time");
+
+      fetch("/api/time").then(
+        response => response.json()
+      ).then(
+        function (data) {
+          console.log(data["now"]);
+          doc.innerText = data["now"];
+        });
+    }
+
+    // update all 10000 ms
+    (function () {
+      update();
+      setInterval(function () {
+        update();
+      }, 1000);
+    })();
+  </script>
+
+
   <div id="footer">
     <p></p>
     {% block footer %}
@@ -82,8 +114,8 @@
     {% endblock %}
   </div>
 
-  
-  
+
+
 </body>
 
 
