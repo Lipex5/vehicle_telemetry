@@ -34,7 +34,7 @@
 
 #define STRING_BUFFER_SIZE 50
 
-#define MQTT_BROKER_URI "mqtt://192.168.0.10:1885"
+#define MQTT_BROKER_URI "mqtt://192.168.0.12:1885"
 
 // GPIO Pins
 #define BLINK_GPIO 2
@@ -209,9 +209,9 @@ void vTaskTest2(void *pvParameters)
     for (;;)
     {
         vTaskDelay(3000 / portTICK_PERIOD_MS);
-        temperature reading = get_NTC_temp(ADC1_CHANNEL_6);
-        printf("Temperature (C): %d\nTemperature (F): %d\nTemperature (K): %d\n", reading.C, reading.F, reading.K);
-        esp_mqtt_client_publish(client, "temp", &reading, 0, 1, 0);
+        char *reading = get_NTC_temp(ADC1_CHANNEL_6);
+        printf("Temperature (C): %s\n", reading);
+        esp_mqtt_client_publish(client, "temp", reading, 0, 1, 0);
         uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
         printf("Stack left on vTaskTest2: %d\n", uxHighWaterMark);
     }

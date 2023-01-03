@@ -7,14 +7,12 @@ void init_sensor(adc_channel_t channel){
     adc1_config_channel_atten(channel, ADC_ATTEN_11db);
 }
 
-// Returns the temp begin read in the channel.
+// Returns the temp being read in the channel.
 // @param channel Channel to be read from
-temperature get_NTC_temp(adc_channel_t channel){
-    temperature temp;
+char *get_NTC_temp(adc_channel_t channel){
 
     uint32_t adc_reading = 0;
 
-    int ThermistorPin = 34;
     double adcMax = 4095.0;        // ADC resolution 12-bit (0-4095)
     double Vs = 3.3;               // supply voltage
 
@@ -42,10 +40,11 @@ temperature get_NTC_temp(adc_channel_t channel){
         Tc = T - 273.15;                   // Celsius
         Tf = Tc * 9 / 5 + 32;              // Fahrenheit
 
-        temp.K = T;
-        temp.C = Tc;
-        temp.F = Tf;
+        int length = snprintf( NULL, 0, "%f", Tc );
+        char *str = malloc( length + 1 );
+        snprintf( str, length + 1, "%.2f", Tc );
+        printf("String: %s\n", str);
 
-        return temp;
+        return str;
     }
 }
