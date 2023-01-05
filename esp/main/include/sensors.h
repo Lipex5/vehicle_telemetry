@@ -1,3 +1,6 @@
+#ifndef SENSORS_FILE
+#define SENSORS_FILE
+
 #include <stdio.h> 
 #include <stdlib.h>
 #include <math.h>
@@ -7,3 +10,5 @@
 
 void init_sensor(adc_channel_t channel);
 char *get_NTC_temp(adc_channel_t channel);
+
+#endif

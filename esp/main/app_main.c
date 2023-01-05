@@ -4,8 +4,6 @@
 #include <string.h>
 #include "esp_system.h"
 
-#include "fileheaders.h"
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
@@ -22,9 +20,19 @@
 
 #include "esp_log.h"
 #include "mqtt_client.h"
+#include "nmea_parser.h"
 
+#include "fileheaders.h"
 #include "sensors.h"
 #include "wifi.h"
+// #include "gps.h"
+
+
+
+#define TIME_ZONE (+1)   // Time Zone
+#define YEAR_BASE (2000) // date in GPS starts from 2000
+
+
 
 // Include for testing the stacks of the tasks
 #ifndef INCLUDE_uxTaskGetStackHighWaterMark
@@ -53,7 +61,7 @@ esp_mqtt_client_handle_t client;
 char *sub_topics[] = {
                         "blink_led",
                         "my_topic",
-                        "temp"
+                        "sensor/temp"
                      };
 
 // Handle the MQTT events
@@ -211,7 +219,7 @@ void vTaskTest2(void *pvParameters)
         vTaskDelay(3000 / portTICK_PERIOD_MS);
         char *reading = get_NTC_temp(ADC1_CHANNEL_6);
         printf("Temperature (C): %s\n", reading);
-        esp_mqtt_client_publish(client, "temp", reading, 0, 1, 0);
+        esp_mqtt_client_publish(client, "sensor/temp", reading, 0, 1, 0);
         uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
         printf("Stack left on vTaskTest2: %d\n", uxHighWaterMark);
     }
@@ -260,6 +268,28 @@ void vLed1Hz(void *pvParameters)
     }
 }
 
+void vGPSTask(void *pvParameters)
+{
+    /* The parameter value is expected to be 1 as 1 is passed in the
+    pvParameters value in the call to xTaskCreate() below. */
+    configASSERT(((uint32_t)pvParameters) == 1);
+
+    // Check stack
+    UBaseType_t uxHighWaterMark;
+
+    printf("vGPSTask started\n");
+
+    uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+
+    // Infinite loop
+    for (;;)
+    {
+        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+        printf("Stack left on vGPSTask: %d\n", uxHighWaterMark);
+    }
+}
+
 void vTaskStarter(void)
 {
     BaseType_t xReturned;
@@ -295,6 +325,31 @@ void vTaskStarter(void)
     }
 }
 
+static void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+{
+    gps_t *gps = NULL;
+    switch (event_id) {
+    case GPS_UPDATE:
+        gps = (gps_t *)event_data;
+        /* print information parsed from GPS statements */
+        ESP_LOGI(TAG, "%d/%d/%d %d:%d:%d => \r\n"
+                 "\t\t\t\t\t\tlatitude   = %.05f°N\r\n"
+                 "\t\t\t\t\t\tlongitude = %.05f°E\r\n"
+                 "\t\t\t\t\t\taltitude   = %.02fm\r\n"
+                 "\t\t\t\t\t\tspeed      = %fm/s",
+                 gps->date.year + YEAR_BASE, gps->date.month, gps->date.day,
+                 gps->tim.hour + TIME_ZONE, gps->tim.minute, gps->tim.second,
+                 gps->latitude, gps->longitude, gps->altitude, gps->speed);
+        break;
+    case GPS_UNKNOWN:
+        /* print unknown statements */
+        ESP_LOGW(TAG, "Unknown statement:%s", (char *)event_data);
+        break;
+    default:
+        break;
+    }
+}
+
 
 void app_main(void)
 {
@@ -306,5 +361,18 @@ void app_main(void)
     printf("WIFI was initiated ...........\n");
 
     vTaskStarter();
-    // mqtt_app_start();
+
+    /* NMEA parser configuration */
+    nmea_parser_config_t config = NMEA_PARSER_CONFIG_DEFAULT();
+    /* init NMEA parser library */
+    nmea_parser_handle_t nmea_hdl = nmea_parser_init(&config);
+    /* register event handler for NMEA parser library */
+    nmea_parser_add_handler(nmea_hdl, gps_event_handler, NULL);
+
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+
+    // /* unregister event handler */
+    // nmea_parser_remove_handler(nmea_hdl, gps_event_handler);
+    // /* deinit NMEA parser library */
+    // nmea_parser_deinit(nmea_hdl);
 }
