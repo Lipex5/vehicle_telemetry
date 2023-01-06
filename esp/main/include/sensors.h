@@ -9,11 +9,13 @@
 
 
 // GPIO Pins
-#define BLINK_GPIO 2
+#define BLINK_GPIO 2            // Led by MQTT
 
-#define LEDC_GPIO 23
+#define LEDC_GPIO 23            // Led 1Hz
 #define LEDC_RESOLUTION 1024
 #define LEDC_FREQ 1
+
+#define NTC_GPIO ADC1_CHANNEL_6
 
 #define NO_OF_SAMPLES 64        // Multisampling
 

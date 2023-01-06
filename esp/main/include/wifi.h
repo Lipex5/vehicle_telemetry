@@ -6,7 +6,7 @@
 #include "esp_netif.h"
 #include "esp_wifi.h"
 
-#define HOME
+#define PHONE
 
 // Wifi Credentials
 // Home

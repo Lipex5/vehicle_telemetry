@@ -1,6 +1,6 @@
 #include "gps.h"
 
-static const char *TAG = "GPS";
+static const char *GPSTAG = "GPS";
 
 void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -9,7 +9,7 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
     case GPS_UPDATE:
         gps = (gps_t *)event_data;
         /* print information parsed from GPS statements */
-        ESP_LOGI(TAG, "%d/%d/%d %d:%d:%d => \r\n"
+        ESP_LOGI(GPSTAG, "%d/%d/%d %d:%d:%d => \r\n"
                  "\t\t\t\t\t\tlatitude   = %.05f°N\r\n"
                  "\t\t\t\t\t\tlongitude = %.05f°E\r\n"
                  "\t\t\t\t\t\taltitude   = %.02fm\r\n"
@@ -28,7 +28,7 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
         break;
     case GPS_UNKNOWN:
         /* print unknown statements */
-        ESP_LOGW(TAG, "Unknown statement:%s", (char *)event_data);
+        ESP_LOGW(GPSTAG, "Unknown statement:%s", (char *)event_data);
         break;
     default:
         break;

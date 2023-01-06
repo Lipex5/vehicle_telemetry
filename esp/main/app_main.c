@@ -23,14 +23,14 @@
 #include "wifi.h"
 #include "gps.h"
 
-
 // Include for testing the stacks of the tasks
 #ifndef INCLUDE_uxTaskGetStackHighWaterMark
 #define INCLUDE_uxTaskGetStackHighWaterMark
 #endif
+
 #define TASK_STACK_SIZE 2500
 
-void vTaskTest(void *pvParameters)
+void vMQTTTask(void *pvParameters)
 {
     /* The parameter value is expected to be 1 as 1 is passed in the
     pvParameters value in the call to xTaskCreate() below. */
@@ -39,9 +39,8 @@ void vTaskTest(void *pvParameters)
     // Check stack
     UBaseType_t uxHighWaterMark;
 
-    printf("vTaskTest started\n");
+    printf("vMQTTTask started\n");
     mqtt_app_start();
-    client = *get_mqtt_client();
 
     uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
 
@@ -50,11 +49,11 @@ void vTaskTest(void *pvParameters)
     {
         vTaskDelay(10000 / portTICK_PERIOD_MS);
         uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
-        printf("Stack left on vTaskTest: %d\n", uxHighWaterMark);
+        printf("Stack left on vMQTTTask: %d\n", uxHighWaterMark);
     }
 }
 
-void vTaskTest2(void *pvParameters)
+void vTempTask(void *pvParameters)
 {
     /* The parameter value is expected to be 1 as 1 is passed in the
     pvParameters value in the call to xTaskCreate() below. */
@@ -63,21 +62,21 @@ void vTaskTest2(void *pvParameters)
     // Check stack
     UBaseType_t uxHighWaterMark;
 
-    printf("vTaskTest2 started\n");
+    printf("vTempTask started\n");
 
     uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
 
-    init_sensor(ADC1_CHANNEL_6);
+    init_sensor(NTC_GPIO);
 
     // Infinite loop
     for (;;)
     {
         vTaskDelay(3000 / portTICK_PERIOD_MS);
-        char *reading = get_NTC_temp(ADC1_CHANNEL_6);
+        char *reading = get_NTC_temp(NTC_GPIO);
         printf("Temperature (C): %s\n", reading);
         esp_mqtt_client_publish(client, "sensor/temp", reading, 0, 1, 0);
         uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
-        printf("Stack left on vTaskTest2: %d\n", uxHighWaterMark);
+        printf("Stack left on vTempTask: %d\n", uxHighWaterMark);
     }
 }
 
@@ -163,27 +162,27 @@ void vGPSTask(void *pvParameters)
 void vTaskStarter(void)
 {
     BaseType_t xReturned;
-    TaskHandle_t xHandleTaskTest = NULL;
-    TaskHandle_t xHandleTaskTest2 = NULL;
+    TaskHandle_t xHandleMQTTTask = NULL;
+    TaskHandle_t xHandleTempTask = NULL;
     TaskHandle_t xHandleLed1Hz = NULL;
     TaskHandle_t xHandleGPSTask = NULL;
 
-    xReturned = xTaskCreate(vTaskTest, "Task Test ", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleTaskTest);
-    configASSERT(xHandleTaskTest);
+    xReturned = xTaskCreate(vMQTTTask, "MQTT Task", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleMQTTTask);
+    configASSERT(xHandleMQTTTask);
 
     if (xReturned != pdPASS)
     {
-        printf("Error creating vTaskTest!\n");
-        vTaskDelete(xHandleTaskTest);
+        printf("Error creating vMQTTTask!\n");
+        vTaskDelete(xHandleMQTTTask);
     }
 
-    xReturned = xTaskCreate(vTaskTest2, "Task Test 2", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleTaskTest2);
-    configASSERT(xHandleTaskTest2);
+    xReturned = xTaskCreate(vTempTask, "Task Test 2", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleTempTask);
+    configASSERT(xHandleTempTask);
 
     if (xReturned != pdPASS)
     {
-        printf("Error creating vTaskTest2!\n");
-        vTaskDelete(xHandleTaskTest2);
+        printf("Error creating vTempTask!\n");
+        vTaskDelete(xHandleTempTask);
     }
 
     xReturned = xTaskCreate(vLed1Hz, "Task Test 2", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleLed1Hz);
@@ -191,7 +190,7 @@ void vTaskStarter(void)
 
     if (xReturned != pdPASS)
     {
-        printf("Error creating vTaskTest2!\n");
+        printf("Error creating vTempTask!\n");
         vTaskDelete(xHandleLed1Hz);
     }
 
