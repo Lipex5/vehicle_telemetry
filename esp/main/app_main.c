@@ -74,7 +74,7 @@ void vTempTask(void *pvParameters)
         vTaskDelay(3000 / portTICK_PERIOD_MS);
         char *reading = get_NTC_temp(NTC_GPIO);
         printf("Temperature (C): %s\n", reading);
-        esp_mqtt_client_publish(client, "sensor/temp", reading, 0, 1, 0);
+        esp_mqtt_client_publish(client, SENSOR_TEMP_TOPIC, reading, 0, 1, 0);
         uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
         printf("Stack left on vTempTask: %d\n", uxHighWaterMark);
     }

@@ -11,14 +11,20 @@
 
 #define STRING_BUFFER_SIZE 50
 
+// MQTT Topics
+#define BLINK_LED_TOPIC    "blink_led"
+#define MY_TOPIC           "my_topic"
+#define SENSOR_TEMP_TOPIC  "sensor/temp"
+#define SENSOR_GPS_TOPIC   "sensor/gps"
+
 esp_mqtt_client_handle_t client;
 
 // All MQTT topics to be subscribed
 static char *sub_topics[] = {
-                        "blink_led",
-                        "my_topic",
-                        "sensor/temp"
-                        "sensor/gps"
+                        BLINK_LED_TOPIC,
+                        MY_TOPIC,
+                        SENSOR_TEMP_TOPIC,
+                        SENSOR_GPS_TOPIC
                      };
 
 // @brief Handles the connections event received by MQTT

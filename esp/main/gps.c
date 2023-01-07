@@ -2,6 +2,7 @@
 
 static const char *GPSTAG = "GPS";
 
+
 void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     gps_t *gps = NULL;
@@ -23,7 +24,7 @@ void gps_event_handler(void *event_handler_arg, esp_event_base_t event_base, int
         snprintf( str, length + 1, "%f,%f,%f", gps->latitude, gps->longitude, gps->speed);
         printf("GPS string: %s\n", str);
 
-        esp_mqtt_client_publish(client, "sensor/gps", str, 0, 1, 0);
+        esp_mqtt_client_publish(client, SENSOR_GPS_TOPIC, str, 0, 1, 0);
 
         break;
     case GPS_UNKNOWN:

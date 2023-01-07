@@ -18,7 +18,7 @@ esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 
         // esp_mqtt_client_subscribe(client, "my_topic", 0);
         // esp_mqtt_client_subscribe(client, "blink_led", 0);
-        esp_mqtt_client_publish(client, "my_topic", "Hi to all from ESP32 .........", 0, 1, 0);
+        esp_mqtt_client_publish(client, MY_TOPIC, "Hi to all from ESP32 .........", 0, 1, 0);
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
@@ -93,7 +93,7 @@ void process_mqtt_data(char *topic, char *data)
     printf("\ntopic=%s\r\n", topic);
     printf("data=%s\r\n", data);
 
-    if (strcmp(topic, "blink_led") == 0)
+    if (strcmp(topic, BLINK_LED_TOPIC) == 0)
     {
         if (strcmp(data, "2") == 0)
         {
