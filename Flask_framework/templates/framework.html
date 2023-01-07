@@ -14,95 +14,156 @@
 
 </head>
 
-
-
 <body>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Isep-logo.png/800px-Isep-logo.png" alt="ISEP Logo"
-    style="float:right;width: 12%;height: 12%;">
-  <h1><i>Telemetria Automovel</i></h1>
+  <a href="https://www.isep.ipp.pt/" target="_blank"><img src="../static/figures/logo_isep-removebg-preview.png"
+      alt="ISEP Logo" style="float:right;width: 12%;height: 12%;margin-right: 0.5%;"></a>
+
+  <h1><i>Telemetria Automóvel</i></h1>
+
   <div id="content">{% block content %}{% endblock %}</div>
-  <h2>Dados</h2>
-  <table>
-    <tr>
-      <th>Grandeza</th>
-      <th>Valor</th>
-      <th>Incerteza</th>
-    </tr>
-    <tr>
-      <td>Velocidade Instantânea</td>
-      <td><mark>TESTE</mark></td>
-      <td>±</td>
-    </tr>
-    <tr>
-      <td>Velocidade Média</td>
-      <td><mark>TESTE</mark></td>
-      <td>±</td>
-    </tr>
-    <tr>
-      <td>Aceleração Instantânea</td>
-      <td><mark>TESTE</mark></td>
-      <td>±</td>
-    </tr>
-    <tr>
-      <td>Aceleração Média</td>
-      <td><mark>TESTE</mark></td>
-      <td>±</td>
-    </tr>
-  </table>
 
-  <h2>Coordenadas</h2>
-  <p>Click the button to get your coordinates.</p>
+  <!-- Tab links -->
+  <div class="tab">
+    <button id="Home Button" class="tablinks" onclick="openCity(event, 'Home')">Home</button>
+    <button class="tablinks" onclick="openCity(event, 'Links')">Links</button>
+    <button class="tablinks" onclick="openCity(event, 'Report')">Report</button>
+  </div>
 
-  <button onclick="getLocation()">Try It</button>
+  <!-- Tab content -->
 
-  <p id="demo"></p>
+  <!-- #region 1º BUTTON -->
+  <div id="Home" class="tabcontent">
 
+    <!--1º Column-->
+
+    <div class="row">
+      <div class="first column">
+
+        <h2>Velocidade</h2>
+        <table class="center">
+          <tr>
+            <th>Grandeza</th>
+            <th>Valor</th>
+            <th>Incerteza</th>
+          </tr>
+          <tr>
+            <td>Velocidade Instantânea</td>
+            <td><var id="vel_status">{{ vel_status }}</var></td>
+            <td>±</td>
+          </tr>
+          <tr>
+            <td>Velocidade Média</td>
+            <td><var id="lat_status">{{ lat_status }}</var></td>
+            <td>±</td>
+          </tr>
+          <tr>
+            <td>Aceleração Instantânea</td>
+            <td><var id="lng_status">{{ lng_status }}</var></td>
+            <td>±</td>
+          </tr>
+          <tr>
+            <td>Aceleração Média</td>
+            <td><mark>TESTE</mark></td>
+            <td>±</td>
+          </tr>
+        </table>
+      </div>
+
+      <!--2º Column-->
+
+      <div class="second column">
+        <h2>Temperatura</h2>
+
+        <table class="center">
+          <tr>
+            <th>Grandeza</th>
+            <th>Valor</th>
+            <th>Incerteza</th>
+          <tr>
+            <td>Celsius</td>
+            <td><var id="temp_celsius">{{ tempC_status }}</var></td>
+            <td>± 5%</td>
+          </tr>
+          <tr>
+            <td>Fahrenheit</td>
+            <td><var id="temp_fahren">{{ tempF_status }}</var></td>
+            <td>± 5%</td>
+          </tr>
+          <tr>
+            <td>Kelvin</td>
+            <td><var id="temp_kelv">{{ tempK_status }}</var></td>
+            <td>± 5%</td>
+          </tr>
+        </table>
+
+      </div>
+
+      <!--3º Column-->
+
+      <div class="third column">
+        <h2>LED</h2>
+
+        <p style="padding-left: 7.5%;"><button id="my-button">On/Off</button>&nbsp;&nbsp;&nbsp;Led State: <var id="led_status">{{ led_status }}</var></p>
+
+        <script>
+          // get the button
+          const button = document.querySelector('#my-button');
+
+          // add a click event listener to the button
+          button.addEventListener('click', () => {
+            // get the value of the variable
+            const blink = '2';
+
+            // send an HTTP POST request to the Flask app
+            fetch('/send', {
+              method: 'POST',
+              body: JSON.stringify({ blink }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+          });
+        </script>
+
+      </div>
+    </div>
+    <!--End of TABLE-->
+
+    <h2>Coordenadas</h2>
+  
+    <script async src="../static/scripts/update_vars.js"></script>
+    <script async src="../static/scripts/maps_api.js"></script>
+
+    <div id="map"></div>
+
+    <!-- End of 1º BUTTON -->
+  </div>
+  <!-- #endregion -->
+  <!-- #region 2º BUTTON -->
+  <div id="Links" class="tabcontent">
+    <h2>Source Code</h2>
+    <p>Check out <a href="https://github.com/" target="_blank">GitHub</a> project repository.</p>
+  </div>
+  <!-- #endregion -->
+  <!-- #region 3º BUTTON -->
+  <div id="Report" class="tabcontent">
+    <p>Check out our project <a href="http://localhost:5001/report" target="_blank">report</a>.</p>
+  </div>
+  <!-- #endregion -->
+
+  <!-- WebPage Script content -->
+
+  <script type="text/javascript" src="../static/scripts/button_tab.js"></script>
   <script>
-    var x = document.getElementById("demo");
-
-    function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-      } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
-      }
-    }
-
-    function showPosition(position) {
-      x.innerHTML = "Latitude: " + position.coords.latitude +
-        "<br>Longitude: " + position.coords.longitude;
+    window.onload = function () {
+      document.getElementById("Home Button").click();
     }
   </script>
-
-  <p>Led State: <var id="led_status">{{ led_status }}</var></p>
-
-  <script type="text/javascript">
-    function update() {
-      let doc = document.getElementById("led_status");
-
-      fetch("/mqtt/data/").then(
-        response => response.json()
-        ).then(
-          function (data) {
-          console.log(data["led"]);
-          doc.innerText = data["led"];
-        });
-    }
-
-    // Update
-    (function () {
-      update();
-      setInterval(function () {
-        update();
-      }, 1000);
-    })();
-  </script>
-
 
   <div id="footer">
     <p></p>
     {% block footer %}
-    &copy; Copyright 2022 by <a href="http://localhost:5001/Hugo">Hugo</a>.
+    &copy; Copyright 2022 by <a href="http://localhost:5001/Hugo_Lipex">Hugo & Lipex</a>.
     {% endblock %}
   </div>
 
