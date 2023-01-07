@@ -10,8 +10,6 @@
 #include "freertos/queue.h"
 #include "freertos/timers.h"
 
-#include <driver/adc.h>
-#include "driver/ledc.h"
 #include "driver/gpio.h"
 
 #include "lwip/sockets.h"
@@ -80,49 +78,6 @@ void vTempTask(void *pvParameters)
     }
 }
 
-void vLed1Hz(void *pvParameters)
-{
-    /* The parameter value is expected to be 1 as 1 is passed in the
-    pvParameters value in the call to xTaskCreate() below. */
-    configASSERT(((uint32_t)pvParameters) == 1);
-
-    ledc_timer_config_t ledpwmconfig = {
-        // Configuração do timer
-
-        .speed_mode = LEDC_LOW_SPEED_MODE,          // Low Speed Mode
-        .duty_resolution = LEDC_TIMER_10_BIT,       // Duty Resolution (2^10 = 1024)
-        .timer_num = LEDC_TIMER_0,                  // TIMER 0
-        .freq_hz = LEDC_FREQ,                       // PWM frequency
-        .clk_cfg = LEDC_AUTO_CLK                    // Clock auto selection
-    };
-    ledc_timer_config(&ledpwmconfig);
-
-    ledc_channel_config_t channel_LEDC = {
-        .gpio_num = LEDC_GPIO,                      // PWM GPIO
-        .speed_mode = LEDC_LOW_SPEED_MODE,          // Low Speed Mode
-        .channel = LEDC_CHANNEL_0,
-        .timer_sel = LEDC_TIMER_0,
-        .duty = 50,
-        .hpoint = 0
-    };
-    ledc_channel_config(&channel_LEDC);
-
-    // Check stack
-    UBaseType_t uxHighWaterMark;
-
-    printf("vLed1Hz started\n");
-
-    uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
-
-    // Infinite loop
-    for (;;)
-    {
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
-        uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
-        printf("Stack left on vLed1Hz: %d\n", uxHighWaterMark);
-    }
-}
-
 void vGPSTask(void *pvParameters)
 {
     /* The parameter value is expected to be 1 as 1 is passed in the
@@ -164,7 +119,6 @@ void vTaskStarter(void)
     BaseType_t xReturned;
     TaskHandle_t xHandleMQTTTask = NULL;
     TaskHandle_t xHandleTempTask = NULL;
-    TaskHandle_t xHandleLed1Hz = NULL;
     TaskHandle_t xHandleGPSTask = NULL;
 
     xReturned = xTaskCreate(vMQTTTask, "MQTT Task", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleMQTTTask);
@@ -185,15 +139,6 @@ void vTaskStarter(void)
         vTaskDelete(xHandleTempTask);
     }
 
-    xReturned = xTaskCreate(vLed1Hz, "Task Test 2", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleLed1Hz);
-    configASSERT(xHandleLed1Hz);
-
-    if (xReturned != pdPASS)
-    {
-        printf("Error creating vTempTask!\n");
-        vTaskDelete(xHandleLed1Hz);
-    }
-
     xReturned = xTaskCreate(vGPSTask, "GPS Task", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleGPSTask);
     configASSERT(xHandleGPSTask);
 
@@ -210,6 +155,7 @@ void app_main(void)
     nvs_flash_init();
     wifi_connection();
     configure_leds();
+    init_1Hz_led();
 
     vTaskDelay(2000 / portTICK_PERIOD_MS);
     printf("WIFI was initiated ...........\n");
