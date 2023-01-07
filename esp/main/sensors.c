@@ -2,27 +2,26 @@
 
 void configure_leds(void)
 {
-    gpio_reset_pin(BLINK_GPIO);
-    // Set the GPIO as a push/pull output
-    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
+    for (int i = 0; i < (sizeof(led_pins) / sizeof(led_pins[0])); i++){
+        gpio_reset_pin(led_pins[i]);
+        // Set the GPIO as a push/pull output
+        gpio_set_direction(led_pins[i], GPIO_MODE_OUTPUT);
+    }
 }
 
-void blink_led(void)
+void blink_led(led *led)
 {
     // Set the GPIO level according to the state (LOW or HIGH)
-    gpio_set_level(BLINK_GPIO, s_led_state);
+    gpio_set_level(led->pin, led->state);
+    led->state = !led->state;
+    printf("Led State: %d\n", led->state);
 }
 
-
-// Initializes the ADC of a sensor defined by channel, 12-bits, 11dB attenuation
-// @param channel Channel to be read from
 void init_sensor(adc_channel_t channel){
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(channel, ADC_ATTEN_11db);
 }
 
-// Returns the temp being read in the channel.
-// @param channel Channel to be read from
 char *get_NTC_temp(adc_channel_t channel){
 
     uint32_t adc_reading = 0;

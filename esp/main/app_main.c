@@ -89,17 +89,17 @@ void vLed1Hz(void *pvParameters)
     ledc_timer_config_t ledpwmconfig = {
         // Configuração do timer
 
-        .speed_mode = LEDC_LOW_SPEED_MODE,          // Modo de Velocidade -> LOW
-        .duty_resolution = LEDC_TIMER_10_BIT,       // Resolução do do ciclo de trabalho (2^10 = 1024 valores)
-        .timer_num = LEDC_TIMER_0,                  // Utilizado o TIMER 0
-        .freq_hz = LEDC_FREQ,                       // Frequência de operação do sinal PWM
-        .clk_cfg = LEDC_AUTO_CLK                    // Seleção automatica da fonte geradora do clock (interna ou externa)
+        .speed_mode = LEDC_LOW_SPEED_MODE,          // Low Speed Mode
+        .duty_resolution = LEDC_TIMER_10_BIT,       // Duty Resolution (2^10 = 1024)
+        .timer_num = LEDC_TIMER_0,                  // TIMER 0
+        .freq_hz = LEDC_FREQ,                       // PWM frequency
+        .clk_cfg = LEDC_AUTO_CLK                    // Clock auto selection
     };
     ledc_timer_config(&ledpwmconfig);
 
     ledc_channel_config_t channel_LEDC = {
-        .gpio_num = LEDC_GPIO,                      // Seleciona o pino para atuar o PWM
-        .speed_mode = LEDC_LOW_SPEED_MODE,          // Modo de Velocidade -> LOW
+        .gpio_num = LEDC_GPIO,                      // PWM GPIO
+        .speed_mode = LEDC_LOW_SPEED_MODE,          // Low Speed Mode
         .channel = LEDC_CHANNEL_0,
         .timer_sel = LEDC_TIMER_0,
         .duty = 50,

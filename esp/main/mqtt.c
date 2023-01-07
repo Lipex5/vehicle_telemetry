@@ -22,6 +22,7 @@ esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
+        esp_restart();
         break;
     case MQTT_EVENT_SUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
@@ -96,9 +97,8 @@ void process_mqtt_data(char *topic, char *data)
     {
         if (strcmp(data, "2") == 0)
         {
-            blink_led();
-            s_led_state = !s_led_state;
-            printf("Led state changed from %d to %d\n", !s_led_state, s_led_state);
+            blink_led(&led_blink);
+            printf("Led state changed from %d to %d\n", !led_blink.state, led_blink.state);
         }
     }
 }

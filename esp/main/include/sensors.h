@@ -19,11 +19,30 @@
 
 #define NO_OF_SAMPLES 64        // Multisampling
 
-static uint8_t s_led_state = 0;
+typedef struct {
+    int pin;
+    uint8_t state;
+}led;
 
+static led led_blink = {BLINK_GPIO, 1};
+
+static int led_pins[] = {
+                    BLINK_GPIO
+                };
+
+// @brief Configures the LED's to be used with the blink function
 void configure_leds(void);
-void blink_led(void);
+
+// @brief Switches the state of the LED's 
+// @param *led gets the address of a led typedef so it can change the state
+void blink_led(led *led);
+
+// @brief Initializes the ADC of a sensor defined by channel, 12-bits, 11dB attenuation
+// @param channel Channel to be read from
 void init_sensor(adc_channel_t channel);
+
+// Returns the temp being read in the channel.
+// @param channel Channel to be read from
 char *get_NTC_temp(adc_channel_t channel);
 
 #endif

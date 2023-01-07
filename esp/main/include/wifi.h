@@ -6,7 +6,7 @@
 #include "esp_netif.h"
 #include "esp_wifi.h"
 
-#define PHONE
+#define HOME
 
 // Wifi Credentials
 // Home
@@ -21,7 +21,10 @@
 #define PASS "teresa123"
 #endif
 
+// @brief Handles the wifi events from the connection. All params default from the ESP32 WiFi library
 static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
+
+// @ brief Starts the WiFi connection with the configurations defined
 void wifi_connection();
 
 #endif
