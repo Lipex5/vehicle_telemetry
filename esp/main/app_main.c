@@ -15,7 +15,9 @@
 #include "freertos/queue.h"
 #include "freertos/timers.h"
 
+#include <driver/adc.h>
 #include "driver/gpio.h"
+#include "dht11.h"
 
 #include "lwip/sockets.h"
 #include "lwip/dns.h"
@@ -26,7 +28,7 @@
 
 // Include for testing the stacks of the tasks
 #ifndef INCLUDE_uxTaskGetStackHighWaterMark
-    #define INCLUDE_uxTaskGetStackHighWaterMark
+#define INCLUDE_uxTaskGetStackHighWaterMark
 #endif
 #define TASK_STACK_SIZE 2500
 
@@ -81,7 +83,7 @@ void wifi_connection()
     esp_event_loop_create_default();     // event loop 			                s1.2
     esp_netif_create_default_wifi_sta(); // WiFi station 	                    s1.3
     wifi_init_config_t wifi_initiation = WIFI_INIT_CONFIG_DEFAULT();
-    esp_wifi_init(&wifi_initiation);    // 					                    s1.4
+    esp_wifi_init(&wifi_initiation); // 					                    s1.4
     // 2 - Wi-Fi Configuration Phase
     esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler, NULL);
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event_handler, NULL);
@@ -89,7 +91,7 @@ void wifi_connection()
         .sta = {
             .ssid = SSID,
             .password = PASS}};
-    
+
     esp_wifi_set_mode(WIFI_MODE_STA);
     esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_configuration);
     // 3 - Wi-Fi Start Phase
@@ -131,17 +133,18 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 
         // Gets the string from events and converts it to be read later
         char topic[STRING_BUFFER_SIZE];
-        for (int i = 0; i < event->topic_len; i++){
+        for (int i = 0; i < event->topic_len; i++)
+        {
             topic[i] = *(event->topic++);
         }
         topic[event->topic_len] = '\0';
 
         char data[STRING_BUFFER_SIZE];
-        for (int i = 0; i < event->data_len; i++){
+        for (int i = 0; i < event->data_len; i++)
+        {
             data[i] = *(event->data++);
         }
         data[event->data_len] = '\0';
-
 
         process_data(topic, data);
 
@@ -172,7 +175,7 @@ static void mqtt_app_start(void)
     esp_mqtt_client_start(client);
 }
 
-void process_data(char* topic, char* data)
+void process_data(char *topic, char *data)
 {
     printf("\ntopic=%s\r\n", topic);
     printf("data=%s\r\n", data);
@@ -200,12 +203,12 @@ static void blink_led(void)
     // Set the GPIO level according to the state (LOW or HIGH)
     gpio_set_level(BLINK_GPIO, s_led_state);
 }
- 
+
 void vTaskTest(void *pvParameters)
 {
     /* The parameter value is expected to be 1 as 1 is passed in the
     pvParameters value in the call to xTaskCreate() below. */
-    configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
+    configASSERT(((uint32_t)pvParameters) == 1);
 
     // Check stack
     UBaseType_t uxHighWaterMark;
@@ -213,13 +216,13 @@ void vTaskTest(void *pvParameters)
     printf("vTaskTest started\n");
     mqtt_app_start();
 
-    uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+    uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
 
     // Infinite loop
     for (;;)
     {
         vTaskDelay(10000 / portTICK_PERIOD_MS);
-        uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+        uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
         printf("Stack left on vTaskTest: %d\n", uxHighWaterMark);
     }
 }
@@ -228,24 +231,40 @@ void vTaskTest2(void *pvParameters)
 {
     /* The parameter value is expected to be 1 as 1 is passed in the
     pvParameters value in the call to xTaskCreate() below. */
-    configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
+    configASSERT(((uint32_t)pvParameters) == 1);
 
     // Check stack
     UBaseType_t uxHighWaterMark;
 
     printf("vTaskTest2 started\n");
 
-    uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+    uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+    
+    DHT11_init(GPIO_NUM_34);
 
     // Infinite loop
     for (;;)
     {
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
-        uxHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
+        uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
         printf("Stack left on vTaskTest2: %d\n", uxHighWaterMark);
+
+        // DHTT11
+        /*
+        adc1_config_width(ADC_WIDTH_BIT_12);
+        adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_0db);
+
+        double read_raw = adc1_get_raw(ADC1_CHANNEL_0);
+
+        printf("Raw Value: %f\n", read_raw);
+        */
+        // DHT11_init(GPIO_NUM_36);
+
+        printf("Temperature is %d \n", DHT11_read().temperature);
+        printf("Humidity is %d\n", DHT11_read().humidity);
+        printf("Status code is %d\n", DHT11_read().status);
     }
 }
-
 
 void vTaskStarter(void)
 {
@@ -253,22 +272,22 @@ void vTaskStarter(void)
     TaskHandle_t xHandleTaskTest = NULL;
     TaskHandle_t xHandleTaskTest2 = NULL;
 
-    xReturned = xTaskCreate( vTaskTest, "Task Test ", TASK_STACK_SIZE, ( void * ) 1, tskIDLE_PRIORITY, &xHandleTaskTest );
+    xReturned = xTaskCreate(vTaskTest, "Task Test ", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleTaskTest);
     configASSERT(xHandleTaskTest);
 
-    if( xReturned != pdPASS )
+    if (xReturned != pdPASS)
     {
         printf("Error creating vTaskTest!\n");
-        vTaskDelete( xHandleTaskTest );
+        vTaskDelete(xHandleTaskTest);
     }
 
-    xReturned = xTaskCreate( vTaskTest2, "Task Test 2", TASK_STACK_SIZE, ( void * ) 1, tskIDLE_PRIORITY, &xHandleTaskTest2 );
+    xReturned = xTaskCreate(vTaskTest2, "Task Test 2", TASK_STACK_SIZE, (void *)1, tskIDLE_PRIORITY, &xHandleTaskTest2);
     configASSERT(xHandleTaskTest2);
 
-    if( xReturned != pdPASS )
+    if (xReturned != pdPASS)
     {
         printf("Error creating vTaskTest2!\n");
-        vTaskDelete( xHandleTaskTest2 );
+        vTaskDelete(xHandleTaskTest2);
     }
 }
 
@@ -282,6 +301,5 @@ void app_main(void)
     printf("WIFI was initiated ...........\n");
 
     vTaskStarter();
-    //mqtt_app_start();
-
+    // mqtt_app_start();
 }
