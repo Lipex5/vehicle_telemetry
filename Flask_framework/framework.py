@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 # region MQTT
 # Configure Flask-MQTT extension
-app.config["MQTT_BROKER_URL"] = "192.168.0.29"
+app.config["MQTT_BROKER_URL"] = "192.168.0.10"
 app.config["MQTT_BROKER_PORT"] = 1885
 app.config[
     "MQTT_USERNAME"
@@ -29,7 +29,7 @@ topic_heartbeat = "my_topic"
 topic_temperature = "sensor/temp"
 topic_gps = "sensor/gps"
 
-esp_data = dict(led=0, tempC=0, tempF=0, tempK=0, lat=42, lng=-8.5, vel=0)
+esp_data = dict(led=0, tempC=0, tempF=0, tempK=0, lat=42, lng=-8.5, vel=0, vel_avg=0)
 
 mqtt_client = Mqtt(app)
 
@@ -78,7 +78,7 @@ def Tab(name):
 
 @app.route("/mqtt/data/")
 def get_data():
-    return {"led": esp_data["led"], "tempC": esp_data["tempC"], "tempF": esp_data["tempF"], "tempK": esp_data["tempK"], "lat": esp_data["lat"], "lng": esp_data["lng"], "vel": esp_data["vel"]}
+    return {"led": esp_data["led"], "tempC": esp_data["tempC"], "tempF": esp_data["tempF"], "tempK": esp_data["tempK"], "lat": esp_data["lat"], "lng": esp_data["lng"], "vel": esp_data["vel"], "vel_avg": esp_data["vel_avg"]}
 
 #region Data parsing function
 def parse_data(data):
@@ -99,6 +99,7 @@ def parse_data(data):
         esp_data["lat"] = gps[0]
         esp_data["lng"] = gps[1]
         esp_data["vel"] = gps[2]
+        esp_data["vel_avg"] = gps[3]
 
 #endregion
 

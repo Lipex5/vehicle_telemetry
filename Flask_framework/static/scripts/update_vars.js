@@ -10,6 +10,7 @@ function update() {
     let lat = document.getElementById("lat_status");
     let lng = document.getElementById("lng_status");
     let vel = document.getElementById("vel_status");
+    let vel_avg = document.getElementById("vel_avg_status");
 
     fetch("/mqtt/data/").then(
         response => response.json()
@@ -32,6 +33,9 @@ function update() {
 
             console.log(data["vel"]);
             vel.innerText = data["vel"];
+
+            console.log(data["vel_avg"]);
+            vel_avg.innerText = data["vel_avg"];
         });
 }
 
