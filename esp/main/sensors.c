@@ -13,8 +13,8 @@ void blink_led(led *led)
 {
     // Set the GPIO level according to the state (LOW or HIGH)
     gpio_set_level(led->pin, led->state);
-    led->state = !led->state;
     printf("Led State: %d\n", led->state);
+    led->state = !led->state;
 }
 
 void init_sensor(adc_channel_t channel){

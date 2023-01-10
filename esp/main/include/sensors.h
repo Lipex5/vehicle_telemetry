@@ -25,7 +25,7 @@ typedef struct {
     uint8_t state;
 }led;
 
-static led led_blink = {BLINK_GPIO, 1};
+static led led_blink = {BLINK_GPIO, 0};
 
 static int led_pins[] = {
                     BLINK_GPIO
