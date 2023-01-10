@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <driver/adc.h>
+#include "driver/ledc.h"
 #include "driver/gpio.h"
 
 
@@ -24,7 +25,7 @@ typedef struct {
     uint8_t state;
 }led;
 
-static led led_blink = {BLINK_GPIO, 1};
+static led led_blink = {BLINK_GPIO, 0};
 
 static int led_pins[] = {
                     BLINK_GPIO
@@ -41,8 +42,11 @@ void blink_led(led *led);
 // @param channel Channel to be read from
 void init_sensor(adc_channel_t channel);
 
-// Returns the temp being read in the channel.
+// @brief Returns the temp being read in the channel.
 // @param channel Channel to be read from
 char *get_NTC_temp(adc_channel_t channel);
+
+// @brief Starts a led blinking at 1Hz PWM
+void init_1Hz_led(void);
 
 #endif

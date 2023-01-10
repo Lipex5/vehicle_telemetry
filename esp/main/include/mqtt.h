@@ -6,7 +6,7 @@
 #include "esp_log.h"
 #include "sensors.h"
 
-#define MQTT_BROKER_URI "mqtt://192.168.0.29:1885"
+#define MQTT_BROKER_URI "mqtt://192.168.0.10:1885"
 #define MQTT_BROKER_PORT 8883
 
 #define STRING_BUFFER_SIZE 50

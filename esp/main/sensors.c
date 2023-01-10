@@ -13,8 +13,8 @@ void blink_led(led *led)
 {
     // Set the GPIO level according to the state (LOW or HIGH)
     gpio_set_level(led->pin, led->state);
-    led->state = !led->state;
     printf("Led State: %d\n", led->state);
+    led->state = !led->state;
 }
 
 void init_sensor(adc_channel_t channel){
@@ -60,4 +60,26 @@ char *get_NTC_temp(adc_channel_t channel){
 
         return str;
     }
+}
+
+void init_1Hz_led(void){
+    ledc_timer_config_t ledpwmconfig = {
+        // Timer configuration
+        .speed_mode = LEDC_LOW_SPEED_MODE,          // Low Speed Mode
+        .duty_resolution = LEDC_TIMER_10_BIT,       // Duty Resolution (2^10 = 1024)
+        .timer_num = LEDC_TIMER_0,                  // TIMER 0
+        .freq_hz = LEDC_FREQ,                       // PWM frequency
+        .clk_cfg = LEDC_AUTO_CLK                    // Clock auto selection
+    };
+    ledc_timer_config(&ledpwmconfig);
+
+    ledc_channel_config_t channel_LEDC = {
+        .gpio_num = LEDC_GPIO,                      // PWM GPIO
+        .speed_mode = LEDC_LOW_SPEED_MODE,          // Low Speed Mode
+        .channel = LEDC_CHANNEL_0,
+        .timer_sel = LEDC_TIMER_0,
+        .duty = 50,
+        .hpoint = 0
+    };
+    ledc_channel_config(&channel_LEDC);
 }

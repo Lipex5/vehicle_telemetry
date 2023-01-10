@@ -1,1 +1,0 @@
-https://github.com/Anacron-mb/esp32-DHT11
